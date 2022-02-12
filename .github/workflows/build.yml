@@ -29,12 +29,19 @@ jobs:
           name: simpleserver
           verbose: true
       - run: dotnet publish simpleserver -r linux-x64 --self-contained
+        name: Publish for Linux x64
         if: startsWith(github.ref, 'refs/tags/')
       - run: dotnet publish simpleserver -r linux-musl-x64 --self-contained
+        name: Publish for Linux Musl
         if: startsWith(github.ref, 'refs/tags/')
       - run: dotnet publish simpleserver -r linux-arm --self-contained
+        name: Publish for Linux Arm
         if: startsWith(github.ref, 'refs/tags/')
       - run: dotnet publish simpleserver -r win-x64 --self-contained
+        name: Publish for Linux Windows
+        if: startsWith(github.ref, 'refs/tags/')
+      - run: dotnet publish simpleserver -p:UseAppHost=false -c Release
+        name: Publish Framework dependent
         if: startsWith(github.ref, 'refs/tags/')
       - name: Copy published files to publish location
         if: startsWith(github.ref, 'refs/tags/')
@@ -48,11 +55,7 @@ jobs:
           cp simpleserver/bin/Release/net6.0/linux-arm/publish/simpleserver.pdb publish/simpleserver-linux-arm.pdb
           cp simpleserver/bin/Release/net6.0/win-x64/publish/simpleserver.exe publish/
           cp simpleserver/bin/Release/net6.0/win-x64/publish/simpleserver.pdb publish/
-      # - name: Publish files
-      #   uses: actions/upload-artifact@v2
-      #   with:
-      #     name: release
-      #     path: publish/
+          find simpleserver/bin/Release/net6.0/publish/ -printf "%P\n" | tar -cvzf publish/simpleserver.tgz --no-recursion -C simpleserver/bin/Release/net6.0/publish/ -T -
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
