@@ -20,6 +20,14 @@ jobs:
         uses: actions/setup-dotnet@v1.9.0
         with:
           dotnet-version: "6.0.x"
+      - run: dotnet test --collect:"XPlat Code Coverage"
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          directory: ./tests/TestResults/*/
+          fail_ci_if_error: true
+          name: simpleserver
+          verbose: true
       - run: dotnet publish simpleserver -r linux-x64 --self-contained
       - run: dotnet publish simpleserver -r linux-musl-x64 --self-contained
       - run: dotnet publish simpleserver -r linux-arm --self-contained
@@ -35,8 +43,8 @@ jobs:
           cp simpleserver/bin/Release/net6.0/linux-arm/publish/simpleserver.pdb publish/simpleserver-linux-arm.pdb
           cp simpleserver/bin/Release/net6.0/win-x64/publish/simpleserver.exe publish/
           cp simpleserver/bin/Release/net6.0/win-x64/publish/simpleserver.pdb publish/
-      - name: Publish files
-        uses: actions/upload-artifact@v2
-        with:
-          name: release
-          path: publish/
+      # - name: Publish files
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: release
+      #     path: publish/
