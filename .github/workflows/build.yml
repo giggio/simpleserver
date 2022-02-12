@@ -1,0 +1,42 @@
+name: Build app
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "*"
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build application
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v1.9.0
+        with:
+          dotnet-version: "6.0.x"
+      - run: dotnet publish simpleserver -r linux-x64 --self-contained
+      - run: dotnet publish simpleserver -r linux-musl-x64 --self-contained
+      - run: dotnet publish simpleserver -r linux-arm --self-contained
+      - run: dotnet publish simpleserver -r win-x64 --self-contained
+      - name: Copy published files to publish location
+        run: |
+          mkdir publish
+          cp simpleserver/bin/Release/net6.0/linux-x64/publish/simpleserver publish/simpleserver-linux-x64
+          cp simpleserver/bin/Release/net6.0/linux-x64/publish/simpleserver.pdb publish/simpleserver-linux-x64.pdb
+          cp simpleserver/bin/Release/net6.0/linux-musl-x64/publish/simpleserver publish/simpleserver-linux-musl-x64
+          cp simpleserver/bin/Release/net6.0/linux-musl-x64/publish/simpleserver.pdb publish/simpleserver-linux-musl-x64.pdb
+          cp simpleserver/bin/Release/net6.0/linux-arm/publish/simpleserver publish/simpleserver-linux-arm
+          cp simpleserver/bin/Release/net6.0/linux-arm/publish/simpleserver.pdb publish/simpleserver-linux-arm.pdb
+          cp simpleserver/bin/Release/net6.0/win-x64/publish/simpleserver.exe publish/
+          cp simpleserver/bin/Release/net6.0/win-x64/publish/simpleserver.pdb publish/
+      - name: Publish files
+        uses: actions/upload-artifact@v2
+        with:
+          name: release
+          path: publish/
