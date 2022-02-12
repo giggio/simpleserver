@@ -29,10 +29,15 @@ jobs:
           name: simpleserver
           verbose: true
       - run: dotnet publish simpleserver -r linux-x64 --self-contained
+        if: startsWith(github.ref, 'refs/tags/')
       - run: dotnet publish simpleserver -r linux-musl-x64 --self-contained
+        if: startsWith(github.ref, 'refs/tags/')
       - run: dotnet publish simpleserver -r linux-arm --self-contained
+        if: startsWith(github.ref, 'refs/tags/')
       - run: dotnet publish simpleserver -r win-x64 --self-contained
+        if: startsWith(github.ref, 'refs/tags/')
       - name: Copy published files to publish location
+        if: startsWith(github.ref, 'refs/tags/')
         run: |
           mkdir publish
           cp simpleserver/bin/Release/net6.0/linux-x64/publish/simpleserver publish/simpleserver-linux-x64
@@ -48,3 +53,8 @@ jobs:
       #   with:
       #     name: release
       #     path: publish/
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: publish/*
