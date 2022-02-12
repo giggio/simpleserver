@@ -20,11 +20,11 @@ jobs:
         uses: actions/setup-dotnet@v1.9.0
         with:
           dotnet-version: "6.0.x"
-      - run: dotnet test --collect:"XPlat Code Coverage"
+      - run: dotnet test /p:CollectCoverage=true
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v2
         with:
-          directory: ./tests/TestResults/*/
+          files: ./tests/TestResults/coverage.cobertura.xml
           fail_ci_if_error: true
           name: simpleserver
           verbose: true

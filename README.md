@@ -1,6 +1,7 @@
 # SimpleServer
 
 [![Build app](https://github.com/giggio/simpleserver/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/giggio/simpleserver/actions/workflows/build.yml)
+[![codecov](https://codecov.io/gh/giggio/simpleserver/branch/main/graph/badge.svg?token=O8UDJRBFR1)](https://codecov.io/gh/giggio/simpleserver)
 
 A simple server to run a static backend. Written in C#, cross platform.
 

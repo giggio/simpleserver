@@ -45,6 +45,6 @@ Options:
   -l, --log-http             Log http output to stdout.
   -d, --directory-browsing   Enable directory browsing.
   --version                  Show version information
-  -?, -h, --help             Show help and usage information");
+  -?, -h, --help             Show help and usage information", StringCompareShould.IgnoreLineEndings);
     }
 }
