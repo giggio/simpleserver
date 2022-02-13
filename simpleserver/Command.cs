@@ -87,8 +87,9 @@ simplePaths {args.SimplePaths}");
         if (args.UseIndex)
             app.UseIndex(new IndexMiddlewareOptions(args.IndexFileName));
         var lifetime = app.Services.GetRequiredService<IHostApplicationLifetime>();
-        lifetime.ApplicationStarted.Register(() => Console.WriteLine("Application running. Press CTRL+C to stop it."));
-        app.Run($"http://{args.Interface}:{args.Port}");
+        var appUrl = $"http://{args.Interface}:{args.Port}";
+        lifetime.ApplicationStarted.Register(() => Console.WriteLine($"Application running at {appUrl}. Press CTRL+C to stop it."));
+        app.Run(appUrl);
         app.Logger.LogInformation("Done!");
     }
 }
