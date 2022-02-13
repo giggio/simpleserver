@@ -35,7 +35,9 @@ public class Commands
 
     public virtual void Run(Args args)
     {
-        Environment.CurrentDirectory = Path.IsPathRooted(args.Path) ? args.Path : Path.Combine(Environment.CurrentDirectory, args.Path);
+        if (!Path.IsPathRooted(args.Path))
+            args = args with { Path = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, args.Path)) };
+        Environment.CurrentDirectory = args.Path;
         var disabledDirectoryBrowsing = args.UseIndex && args.EnableDirectoryBrowsing;
         if (disabledDirectoryBrowsing)
             args = args with { EnableDirectoryBrowsing = false };
@@ -44,9 +46,13 @@ public class Commands
             WebRootPath = args.Path,
             ContentRootPath = args.Path
         });
+        if (args.Verbose)
+            builder.Logging.SetMinimumLevel(LogLevel.Information);
+        else
+            builder.Logging.SetMinimumLevel(LogLevel.Warning);
         if (args.EnableDirectoryBrowsing)
             builder.Services.AddDirectoryBrowser();
-        var app = builder.Build();
+        using var app = builder.Build();
         if (disabledDirectoryBrowsing)
             app.Logger.LogWarning($"Disabling directory browsing, as use index is selected.");
         var indexFullFileName = Path.Combine(args.Path, args.IndexFileName);
@@ -80,6 +86,8 @@ simplePaths {args.SimplePaths}");
             app.UseDirectoryBrowser();
         if (args.UseIndex)
             app.UseIndex(new IndexMiddlewareOptions(args.IndexFileName));
+        var lifetime = app.Services.GetRequiredService<IHostApplicationLifetime>();
+        lifetime.ApplicationStarted.Register(() => Console.WriteLine("Application running. Press CTRL+C to stop it."));
         app.Run($"http://{args.Interface}:{args.Port}");
         app.Logger.LogInformation("Done!");
     }
