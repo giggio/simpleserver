@@ -1,2 +1,8 @@
+using System.CommandLine.Builder;
+using System.CommandLine.Parsing;
+
 var rootCommand = new Commands().CreateRootCommand(Environment.CurrentDirectory);
-rootCommand.Invoke(args);
+var parser = new CommandLineBuilder(rootCommand)
+    .UseDefaults()
+    .Build();
+return parser!.Invoke(args);

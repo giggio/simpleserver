@@ -9,7 +9,7 @@ public class Commands
             currentDirectory = Environment.CurrentDirectory;
         var indexOption = new Option<bool>(new[] { "--index", "-i" }, "Use a default index file when a file is not found.") { Arity = ArgumentArity.ZeroOrOne };
         var interfaceOption = new Option<string>(new[] { "--interface" }, () => "0.0.0.0", "Network interface (IP or hostname) to bind the server to.");
-        var portOption = new Option<int>(new[] { "--port", "-p" }, () => 8080, "Port to run the server at.");
+        var portOption = new Option<ushort?>(new[] { "--port", "-p" }, () => 8080, "Port to run the server at.");
         var verboseOption = new Option<bool>(new[] { "-v", "--verbose" }, "Show verbose output.") { Arity = ArgumentArity.ZeroOrOne };
         var enableDirectoryBrowsingOption = new Option<bool>(new[] { "--directory-browsing", "-d" }, "Enable directory browsing.") { Arity = ArgumentArity.ZeroOrOne };
         var useSimplePathsOption = new Option<bool>(new[] { "--simple-paths", "-s" }, "Use simple paths. Allows to serve 'file.html' as '/file'.") { Arity = ArgumentArity.ZeroOrOne };
@@ -61,22 +61,20 @@ public class Commands
             args = args with { UseIndex = false };
             app.Logger.LogWarning("Disabling index, as the index file could not be found at '{indexFullFileName}'.", indexFullFileName);
         }
-        if (args.Verbose)
-        {
-            app.Logger.LogInformation($@"path {args.Path}
-use index {args.UseIndex}
-indexFileName {args.IndexFileName}
-verbose {args.Verbose}
-enableDirectoryBrowsing {args.EnableDirectoryBrowsing}
-logHttpRequests {args.LogHttpRequests}
-port {args.Port}
-interface {args.Interface}
-simplePaths {args.SimplePaths}");
-        }
         if (args.LogHttpRequests)
             app.UseHttpLogging();
-        if (!args.EnableDirectoryBrowsing && args.SimplePaths)
-            app.UseSimplePaths();
+        if (args.SimplePaths)
+        {
+            if (args.EnableDirectoryBrowsing)
+            {
+                args = args with { SimplePaths = false };
+                app.Logger.LogWarning("Disabling simple paths as directory browsing is enabled.");
+            }
+            else
+            {
+                app.UseSimplePaths();
+            }
+        }
         app.UseStaticFiles(new StaticFileOptions
         {
             ServeUnknownFileTypes = true,
@@ -89,6 +87,18 @@ simplePaths {args.SimplePaths}");
         var lifetime = app.Services.GetRequiredService<IHostApplicationLifetime>();
         var appUrl = $"http://{args.Interface}:{args.Port}";
         lifetime.ApplicationStarted.Register(() => Console.WriteLine($"Application running at {appUrl}. Press CTRL+C to stop it."));
+        if (args.Verbose)
+        {
+            app.Logger.LogInformation($@"path {args.Path}
+use index {args.UseIndex}
+indexFileName {args.IndexFileName}
+verbose {args.Verbose}
+enableDirectoryBrowsing {args.EnableDirectoryBrowsing}
+logHttpRequests {args.LogHttpRequests}
+port {args.Port}
+interface {args.Interface}
+simplePaths {args.SimplePaths}");
+        }
         app.Run(appUrl);
         app.Logger.LogInformation("Done!");
     }
@@ -98,7 +108,7 @@ public class ArgsBinder : BinderBase<Args>
 {
     private readonly Option<bool> useIndex;
     private readonly Option<string> @interface;
-    private readonly Option<int> port;
+    private readonly Option<ushort?> port;
     private readonly Option<string> indexFileName;
     private readonly Option<bool> verbose;
     private readonly Option<bool> simplePaths;
@@ -108,7 +118,7 @@ public class ArgsBinder : BinderBase<Args>
 
     public ArgsBinder(Option<bool> useIndex,
                       Option<string> @interface,
-                      Option<int> port,
+                      Option<ushort?> port,
                       Option<string> indexFileName,
                       Option<bool> verbose,
                       Option<bool> simplePaths,
@@ -130,9 +140,9 @@ public class ArgsBinder : BinderBase<Args>
     protected override Args GetBoundValue(BindingContext bindingContext) =>
         new(
             bindingContext.ParseResult.GetValueForOption(useIndex),
-            bindingContext.ParseResult.GetValueForOption(@interface),
+            bindingContext.ParseResult.GetValueForOption(@interface)!, // we have a default for this option
             bindingContext.ParseResult.GetValueForOption(port),
-            bindingContext.ParseResult.GetValueForOption(indexFileName),
+            bindingContext.ParseResult.GetValueForOption(indexFileName)!, // we have a default for this option
             bindingContext.ParseResult.GetValueForOption(verbose),
             bindingContext.ParseResult.GetValueForOption(simplePaths),
             bindingContext.ParseResult.GetValueForOption(logHttpRequests),
@@ -141,4 +151,4 @@ public class ArgsBinder : BinderBase<Args>
         );
 }
 
-public record Args(bool UseIndex, string Interface, int Port, string IndexFileName, bool Verbose, bool SimplePaths, bool LogHttpRequests, bool EnableDirectoryBrowsing, string Path);
+public record Args(bool UseIndex, string Interface, ushort? Port, string IndexFileName, bool Verbose, bool SimplePaths, bool LogHttpRequests, bool EnableDirectoryBrowsing, string Path);
