@@ -8,6 +8,7 @@
         <VersionSuffix Condition="'$(GITHUB_RUN_NUMBER)' != ''">$(GITHUB_RUN_NUMBER)</VersionSuffix>
         <VersionSuffix Condition="'$(VersionSuffix)' == ''">0</VersionSuffix>
         <Version>$(VersionPrefix).$(VersionSuffix)</Version>
+        <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     </PropertyGroup>
 
     <PropertyGroup>
