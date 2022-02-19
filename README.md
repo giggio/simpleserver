@@ -1,5 +1,6 @@
 # SimpleServer
 
+[![NuGet version (simpleserver-tool)](https://img.shields.io/nuget/v/simpleserver-tool?color=blue)](https://www.nuget.org/packages/simpleserver-tool/)
 [![Build app](https://github.com/giggio/simpleserver/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/giggio/simpleserver/actions/workflows/build.yml)
 [![codecov](https://codecov.io/gh/giggio/simpleserver/branch/main/graph/badge.svg?token=O8UDJRBFR1)](https://codecov.io/gh/giggio/simpleserver)
 
@@ -64,6 +65,8 @@ You will need all the files that are in the .tgz, decompress it to a directory a
 
 ## Installing
 
+### Standalone binaries
+
 Download an artifact from the latest
 [release](https://github.com/giggio/simpleserver/releases/latest)
 and add it to your path.
@@ -78,6 +81,16 @@ are dynamic binaries, they can't run on distroless containers (`FROM scratch`).
 * `simpleserver.tgz` - Cross platform, [framework dependent](https://docs.microsoft.com/en-us/dotnet/core/deploying/#publish-framework-dependent)
 
 The `.pdb` files are symbol files and are only needed for debugging, not running the application.
+
+### As a dotnet cli tool
+
+This tool can be installed as a dotnet global tool, if you have the .NET Sdk installed.
+It is hosted [on nuget.org as `simpleserver-tool`](https://www.nuget.org/packages/simpleserver-tool).
+Install with:
+
+```bash
+dotnet tool install --global simpleserver-tool
+```
 
 ### Completions
 
