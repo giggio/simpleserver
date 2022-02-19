@@ -29,6 +29,7 @@
         <SelfContained>true</SelfContained>
         <PublishReadyToRun>true</PublishReadyToRun>
         <PublishTrimmed>true</PublishTrimmed>
+        <TrimmerDefaultAction>link</TrimmerDefaultAction>
         <InvariantGlobalization>true</InvariantGlobalization>
     </PropertyGroup>
 
@@ -47,7 +48,7 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="System.CommandLine" Version="2.0.0-beta3.22106.2" />
+        <PackageReference Include="System.CommandLine" Version="2.0.0-beta3.22114.1" />
     </ItemGroup>
 
 </Project>
