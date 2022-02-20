@@ -6,7 +6,9 @@
 
 A simple server command line tool to run a static backend. Written in C#, cross platform.
 
-It is cross platform, has around 30MB, and does not require .NET ou .NET Framework to run.
+It has small, has only around 30MB. If you have the .NET Runtime or Sdk it is less than 300KB.
+
+It does not require .NET ou .NET Framework to run.
 
 ## Running
 
